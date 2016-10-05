@@ -1,0 +1,54 @@
+Libraries
+  jme3-libraries-oggvorbis
+  jme3-libraries-lwjgl-minimum
+  jme3-libraries-physics
+  jme3
+
+ALPHA
+  BUG: cannot move through blocks when smashed -
+       remove from bullet ?
+  BUG: remove all mouse and keyboard effects
+       from tampering with the game when in menu.
+  BUG: makeRespawnThread throws an exception - rarely
+
+BETA
+  serialize appSettings to file just like state
+  ctrl: crouch so player can pass between nodes with 1 free space
+  controls:
+    set sensitivity!
+  fix really nice ui
+  Audio - jME Audio
+  map layouts: (loop between them)
+    make 5-10 specific 'non-quadratic' map layout and choose one (randomly?)
+    maps with colored cubes
+    maps with colored background (white background is HARD)
+  online scoreboard -> from the game client itself
+  cones: smaller and moves randomly for each step
+       => no patterns.
+       colored red or green from the beginning?
+  Multiplayer networking
+    SpiderMonkey client/server networking
+    co-op and chat functions -> also feeds into the gui part.
+  Sky - Sky bucket
+  
+    one sound for painting, one for smashing and one for winning
+    also some background music
+  Non-quadratic maps
+  A Java Profiler can be added to the jMonkeyPlatform
+    - better performance
+
+Storyline:
+There's trouble in cube world!
+Wicked spheres hav invaded the otherwise peaceful world of the cubes.
+It is your job to find the spheres and destroy them before all is lost.
+Also take care in your hunt because the underlings of the spheres -
+the dreaded CONES - are out to get you.
+Now as we all know, cubes prefer to be white so you're only allowed to color
+a fixed amount of them at a time.
+Luckily the cubes are so desperate in getting rid of the spheres that,
+if asked, the cubes will graciously disapper to let you through and then
+reappear shortly after.
+Good luck. CUBE!
+
+BLOG:
+Sound added. Background and eventdriven...

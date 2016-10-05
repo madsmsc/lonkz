@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty>
+    <screen id="start" controller="mygame.Menu">
+        <layer id="mainLayer"
+          backgroundColor="#dddddd95" childLayout="vertical">
+
+            <panel id="SPACERgfd" height="12%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="controls" height="30%" width="60%" align="center"
+             backgroundColor="#666" childLayout="center" visibleToMouse="true">
+                <label id="txtCurrentDescription" height="10%" width="100%" font="aurulent-sans-17.fnt" 
+                text="Controls: Use mouse for steering .. Mouse 1 to paint, Mouse 2 to despawn cubes..."
+                align="center" valign="center" wrap="true" />
+            </panel>
+
+            <panel id="SPACERjk" height="6%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="back" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="backToMenu()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Back" align="center" valign="center" />
+            </panel>
+
+        </layer>
+    </screen>
+</nifty>

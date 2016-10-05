@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty>
+    <screen id="start" controller="mygame.Menu">
+        <layer id="mainLayer"
+          backgroundColor="#dddddd95" childLayout="vertical">
+
+            <panel id="SPACERgfd" height="12%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="play" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="play()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Play" align="center" valign="center" />
+            </panel>
+
+            <panel id="SPACEjhjR" height="6%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="load" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="load()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Load" align="center" valign="center" />
+            </panel>
+
+            <panel id="SPACERhjk" height="6%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="controls" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="controls()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Controls" align="center" valign="center" />
+            </panel>
+
+            <panel id="SPACERjk" height="6%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="exit" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="exit()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Exit" align="center" valign="center" />
+            </panel>
+
+        </layer>
+    </screen>
+</nifty>

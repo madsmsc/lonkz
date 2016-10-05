@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty>
+    <screen id="start" controller="mygame.Menu">
+        <layer id="mainLayer"
+          backgroundColor="#dddddd95" childLayout="vertical">
+
+            <panel id="SPACERgfd" height="12%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="story" height="50%" width="60%" align="center"
+             backgroundColor="#666" childLayout="center" visibleToMouse="true">
+                <label id="txtCurrentDescription" height="100%" width="100%" font="aurulent-sans-17.fnt"
+                       align="left" valign="center" wrap="true"
+text="                           There's trouble in cube world!                               
+Wicked spheres have invaded the otherwise peaceful world of the cubes.
+It is your job to find the spheres and destroy them before all is lost.
+Also take care in your hunt because the underlings of the spheres -
+the dreaded CONES - are out to get you.
+Now as we all know, cubes prefer to be white so you're only allowed to color
+a fixed amount of them at a time.
+Luckily the cubes are so desperate in getting rid of the spheres that,
+if asked, the cubes will graciously disapper to let you through and then
+reappear shortly after.     
+Good luck. CUBE!" />
+            </panel>
+
+            <panel id="SPACERjk" height="6%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="play" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="newGame()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Play" align="center" valign="center" />
+            </panel>
+
+            <panel id="SPACERsk" height="6%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="back" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="backToMenu()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="2px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
+	           endColor="#sd02" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Back" align="center" valign="center" />
+            </panel>
+
+        </layer>
+    </screen>
+</nifty>

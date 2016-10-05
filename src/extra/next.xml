@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty>
+    <screen id="start" controller="mygame.Menu">
+        <layer id="mainLayer"
+	   backgroundColor="#00000095" childLayout="vertical">
+
+            <panel id="SPACERxcv" backgroundColor="#0000" height="10%" width="100%"
+             align="center" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="SPACERhjjk" height="8%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="next" height="6%" width="20%" align="center"
+             backgroundColor="#666" childLayout="center" visibleToMouse="false">
+                <effect>
+                    <onActive name="border" color="#fff" border="1px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#EE7F"
+	           endColor="#EE7F" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="You won!" align="center" valign="center" />
+            </panel>
+
+            <panel id="SPACERbnm" height="8%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="gameNext" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="next()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="1px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#EE7F"
+	           endColor="#EE7F" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Next" align="center" valign="center" />
+            </panel>
+
+            <panel id="SPACuyr" height="10%" width="100%" align="center"
+             backgroundColor="#0000" childLayout="center" visibleToMouse="false">
+            </panel>
+
+            <panel id="gameExit" height="6%" width="20%" align="center"
+             backgroundColor="#BBBF" childLayout="center" visibleToMouse="true">
+                <interact onClick="exit()"/>
+                <effect>
+                    <onActive name="border" color="#fff" border="1px" />
+                    <onHover name="pulsate" scaleFactor="0.008" startColor="#EE7F"
+	           endColor="#EE7F" post="true"/>
+                </effect>
+                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+	      text="Exit Game" align="center" valign="center" />
+            </panel>
+
+        </layer>
+    </screen>
+</nifty>

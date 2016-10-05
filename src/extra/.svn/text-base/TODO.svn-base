@@ -1,0 +1,33 @@
+Libraries
+  jme3-libraries-oggvorbis
+  jme3-libraries-lwjgl-minimum
+  jme3-libraries-physics
+  jme3
+
+ALPHA
+  BUG: GUI / nifty fails...
+  BUG: twitchy movement sometimes
+  BUG: noclip bug
+  BUG: makeRespawnThread throws an exception when 
+       blocks are respawned - sometimes
+  levels:
+    1
+    2
+    3
+    
+BETA
+  Multiplayer networking
+    SpiderMonkey client/server networking
+    co-op and chat functions -> also feeds into the gui part.
+  Sky - Sky bucket
+  Audio - jME Audio
+    one sound for painting, one for smashing and one for winning
+  Non-quadratic maps
+  A Java Profiler can be added to the jMonkeyPlatform via
+    Tools → Plugins → Available.
+    The profiler presents statistics on the lifecycle of methods and objects.
+    Performance problems may be caused by just a few methods that take long,
+    or are called too often. If object creation and garbage collection counts
+    keep increasing, you are looking at a memory leak.
+  Save games -> perhaps in lib folder?
+  Web Start - JNLP

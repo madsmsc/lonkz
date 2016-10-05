@@ -1,0 +1,28 @@
+package mygame;
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.screen.Screen;
+import de.lessvoid.nifty.screen.ScreenController;
+
+public class Menu extends Main implements ScreenController {
+
+  public void bind(Nifty nifty, Screen screen) {
+    this.nifty = nifty;
+  }
+
+  public void onStartScreen() {
+    // do nothing
+  }
+
+  public void onEndScreen() {
+    // do nothing
+  }
+
+  public void options() {
+      System.out.println("options");
+  }
+
+  public void exit() {
+      System.out.println("exit");
+      terminateProgram();
+  }
+}

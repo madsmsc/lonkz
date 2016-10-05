@@ -1,0 +1,614 @@
+package mygame;
+
+import com.jme3.app.SimpleApplication;
+import com.jme3.audio.AudioNode;
+import com.jme3.audio.Environment;
+import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
+import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
+import com.jme3.bullet.nodes.PhysicsCharacterNode;
+import com.jme3.bullet.nodes.PhysicsNode;
+import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.collision.CollisionResult;
+import com.jme3.collision.CollisionResults;
+import com.jme3.font.BitmapFont;
+import com.jme3.font.BitmapText;
+import com.jme3.font.Rectangle;
+import com.jme3.input.KeyInput;
+import com.jme3.input.controls.ActionListener;
+import com.jme3.input.controls.KeyTrigger;
+import com.jme3.input.controls.MouseButtonTrigger;
+import com.jme3.material.Material;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.Ray;
+import com.jme3.math.Vector3f;
+import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
+import com.jme3.scene.shape.Box;
+import com.jme3.scene.shape.Sphere;
+import de.lessvoid.nifty.Nifty;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Main extends SimpleApplication {
+  
+  public boolean inMenu = false;
+  public Nifty nifty;
+  private AudioNode audioPaint;
+  private AudioNode audioSmash;
+  private AudioNode audioDeath;
+  private AudioNode audioBackground;
+  private boolean deathPlayed = false;
+  private boolean placeHitSphere = false;
+  private Random r = new Random();
+  private NiftyJmeDisplay niftyDisplay;
+  private BulletAppState bulletAppState;
+  private PhysicsNode landscape;
+  private PhysicsCharacterNode player;
+  private Vector3f walkDirection = new Vector3f();
+  private boolean left = false;
+  private boolean right = false;
+  private boolean up = false;
+  private boolean down = false;
+  private boolean dead = false;
+  private Node shootables;
+  private Node smashed;
+  private Geometry mark;
+  private BitmapText ch;
+  private BitmapText smashedTxt;
+  private BitmapText paintedTxt;
+  private BitmapText orbsLeftTxt;
+  private BitmapText levelTxt;
+  private int blockName = 1;
+  private int blocksPainted = 0;
+  private int smashesLeft = 8;
+  private int level = 1;
+  private int orbsLeft;
+  private int blocksAmount = 200;
+  private static final int size = 20;
+  private static final int height = 5;
+  private static final int blockRespawnTime = 5000;
+  private static final int deathFallDist = -100;
+  private static final String version = "Alpha - 3";
+  private static final Vector3f startLoc = new Vector3f(19, 5, 19);
+  private int[][][] blocks = new int[size][height][size];
+
+  public static void main(String[] args) {
+	Main m = new Main();
+    // disable basic logging
+    Logger.getLogger("").setLevel(Level.SEVERE);
+    // disable splash screen
+    m.setShowSettings(false);
+    // set specific screen settings
+    AppSettings settings = new AppSettings(true);
+    settings.put("Width", 800);
+    settings.put("Height", 600);
+    settings.put("Title", "lonkz");
+    settings.put("VSync", true);
+    settings.put("Samples", 4);
+    m.setSettings(settings);
+    // start game
+    m.start();
+  }
+  
+  private void initFields(){
+	  orbsLeft = level*2;
+	  // maybe reset all fields to initial values?
+  }
+
+  public void simpleInitApp() {
+	initFields();
+    initKeys();
+    initMark();
+    initAudio();
+    initBlocksArray();
+    createBlocks();
+    initBorders();
+    initCollision();
+    backFromMenu();
+    initSky();
+  }
+
+  private void initAudio(){
+    // paint
+    audioPaint = new AudioNode(assetManager, "Sounds/paint.wav", false);
+    audioPaint.setLooping(false);
+    audioPaint.setVolume(0.4f);
+    audioPaint.setPositional(false) ;
+    audioPaint.setDirectional(false);
+
+    // smash
+    audioSmash = new AudioNode(assetManager, "Sounds/smash.wav", false);
+    audioSmash.setLooping(false);
+    audioSmash.setVolume(0.4f);
+    audioSmash.setPositional(false) ;
+    audioSmash.setDirectional(false);
+
+    // background
+    audioBackground = new AudioNode(assetManager, "Sounds/background.wav", false);
+    audioBackground.setLooping(false);
+    audioBackground.setVolume(0.4f);
+    audioBackground.setPositional(false) ;
+    audioBackground.setDirectional(false);
+
+    // death
+    audioDeath = new AudioNode(assetManager, "Sounds/death.wav", false);
+    audioDeath.setLooping(false);
+    audioDeath.setVolume(0.4f);
+    audioDeath.setPositional(false) ;
+    audioDeath.setDirectional(false);
+
+    // set audio environment
+    audioRenderer.setEnvironment(new Environment(Environment.Closet));
+  }
+
+  public void terminateProgram() {
+    //nifty.exit();
+    //this.stop();
+    System.exit(0);
+  }
+
+  public void backFromMenu() {
+    inMenu = false;
+    guiNode.detachAllChildren();
+
+    if(guiViewPort.getProcessors().contains(niftyDisplay))
+      guiViewPort.removeProcessor(niftyDisplay);
+    niftyDisplay = new NiftyJmeDisplay(
+	    assetManager, inputManager, audioRenderer, guiViewPort);
+    nifty = niftyDisplay.getNifty();
+    nifty.fromXml("assets/Interface/gui.xml", "start");
+
+    // attach the nifty display to the gui view port as a processor
+    guiViewPort.addProcessor(niftyDisplay);
+    
+    initCrossHairs();
+    initGui();
+    flyCam.setDragToRotate(false);
+  }
+
+  private void initSky() {
+    // black
+    //viewPort.setBackgroundColor(ColorRGBA.Black);
+
+    // sky blue
+    viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
+
+    /* make a dynamic sphere around the player
+    rootNode.attachChild(SkyFactory.createSky(assetManager,
+    "Textures/Sky/Bright/BrightSky.dds", false));
+    Spatial sky = SkyFactory.createSky(assetManager, "yourpath.dds", false);
+    sky.setLocalScale(100);
+    rootNode.attachChild(sky);
+     */
+  }
+
+  private void youWin() {
+    System.out.println("You win!");
+    dead = true;
+    stop();
+    // this should use Nifty to make the win screen
+  }
+
+  private void youLose() {
+    System.out.println("You lost!");
+    dead = true;
+    stop();
+    // this should use Nifty to make the lose screen
+  }
+
+  private void setupMenu() {
+    inMenu = true;
+    guiNode.detachAllChildren();
+    guiViewPort.removeProcessor(niftyDisplay);
+    niftyDisplay = new NiftyJmeDisplay(
+	    assetManager, inputManager, audioRenderer, guiViewPort);
+    nifty = niftyDisplay.getNifty();
+    nifty.fromXml("assets/Interface/menu.xml", "start");
+    guiViewPort.addProcessor(niftyDisplay);
+    // disable the fly cam
+    flyCam.setDragToRotate(true);
+  }
+
+  @Override
+  public void simpleUpdate(float tpf) {
+    Vector3f camDir = cam.getDirection().clone().multLocal(0.2f);
+    Vector3f camLeft = cam.getLeft().clone().multLocal(0.1f);
+    // do not move vertically
+    camDir.y = 0;
+    camLeft.y = 0;
+
+    walkDirection.set(0, 0, 0);
+    if (left) {
+      walkDirection.addLocal(camLeft);
+    }
+    if (right) {
+      walkDirection.addLocal(camLeft.negate());
+    }
+    if (up) {
+      walkDirection.addLocal(camDir);
+    }
+    if (down) {
+      walkDirection.addLocal(camDir.negate());
+    }
+    player.setWalkDirection(walkDirection);
+    cam.setLocation(player.getLocalTranslation());
+
+    // play falling sound
+    if(cam.getLocation().y < -2 && !deathPlayed){
+      deathPlayed = true;
+      //audioRenderer.playSource(audioDeath);
+    }
+
+    // lose if you fall too far.
+    if (cam.getLocation().y < deathFallDist) {
+      youLose();
+    }
+
+    // make audio follow cam
+    listener.setLocation(cam.getLocation());
+    listener.setRotation(cam.getRotation());
+  }
+
+  private void initCollision() {
+    /** Set up Physics */
+    bulletAppState = new BulletAppState();
+    stateManager.attach(bulletAppState);
+
+    CompoundCollisionShape sceneShape =
+	    (CompoundCollisionShape) CollisionShapeFactory.createMeshShape(shootables);
+    landscape = new PhysicsNode(shootables, sceneShape, 0);
+
+    player = new PhysicsCharacterNode(new CapsuleCollisionShape(1f, 2f, 1), .05f);
+    player.setJumpSpeed(15);
+    player.setFallSpeed(30);
+    player.setGravity(30);
+    player.setLocalTranslation(startLoc);
+
+    // init cam dir
+    Vector3f dir = cam.getDirection();
+    dir.x *= -1;
+    dir.y *= -1;
+    dir.z *= -1;
+    cam.setDirection(dir);
+
+    // attach to root node
+    rootNode.attachChild(landscape);
+    rootNode.attachChild(player);
+    bulletAppState.getPhysicsSpace().add(landscape);
+    bulletAppState.getPhysicsSpace().add(player);
+  }
+
+  private void initGui() {
+    // fps?
+    //loadFPSText();
+
+    // painted
+    BitmapFont fnt = assetManager.loadFont("Interface/Fonts/Default.fnt");
+    paintedTxt = new BitmapText(fnt, false);
+    paintedTxt.setBox(new Rectangle(settings.getWidth() - 170, -20,
+	    settings.getWidth(), settings.getHeight()));
+    paintedTxt.setSize(fnt.getPreferredSize() * 1f);
+    paintedTxt.setColor(ColorRGBA.White);
+    paintedTxt.setText("BLOCKS PAINTED: " + blocksPainted);
+    paintedTxt.setLocalTranslation(0, settings.getHeight(), 0);
+    guiNode.attachChild(paintedTxt);
+
+    // smashed
+    smashedTxt = new BitmapText(fnt, false);
+    smashedTxt.setBox(new Rectangle(settings.getWidth() - 170, 0,
+	    settings.getWidth(), settings.getHeight()));
+    smashedTxt.setSize(fnt.getPreferredSize() * 1f);
+    smashedTxt.setColor(ColorRGBA.White);
+    smashedTxt.setText("SMASHES LEFT: " + smashesLeft);
+    smashedTxt.setLocalTranslation(0, settings.getHeight(), 0);
+    guiNode.attachChild(smashedTxt);
+
+    // orbs left
+    orbsLeftTxt = new BitmapText(fnt, false);
+    orbsLeftTxt.setBox(new Rectangle(settings.getWidth() - 170, -40,
+	    settings.getWidth(), settings.getHeight()));
+    orbsLeftTxt.setSize(fnt.getPreferredSize() * 1f);
+    orbsLeftTxt.setColor(ColorRGBA.White);
+    orbsLeftTxt.setText("ORBS LEFT: " + orbsLeft);
+    orbsLeftTxt.setLocalTranslation(0, settings.getHeight(), 0);
+    guiNode.attachChild(orbsLeftTxt);
+
+    // level
+    levelTxt = new BitmapText(fnt, false);
+    levelTxt.setBox(new Rectangle(settings.getWidth() - 170, -60,
+	    settings.getWidth(), settings.getHeight()));
+    levelTxt.setSize(fnt.getPreferredSize() * 1f);
+    levelTxt.setColor(ColorRGBA.White);
+    levelTxt.setText("LEVEL: " + level);
+    levelTxt.setLocalTranslation(0, settings.getHeight(), 0);
+    guiNode.attachChild(levelTxt);
+  }
+
+  private int setBlocks(int i) {
+    if (i == 0) {
+      return 0;
+    }
+    int x = r.nextInt(size);
+    int y = r.nextInt(height);
+    int z = r.nextInt(size);
+    // do no override blocks
+    if (blocks[x][y][z] == 1
+	    || (x >= 9 && x <= 11)
+	    && (z >= 9 && z <= 11)) {
+      return setBlocks(i);
+    } else {
+      blocks[x][y][z] = 1;
+      return setBlocks(i - 1);
+    }
+  }
+
+  private int setSpheres(int i) {
+    if (i == 0) {
+      return 0;
+    }
+    int x = r.nextInt(size);
+    int y = r.nextInt(height);
+    int z = r.nextInt(size);
+    // do no override blocks
+    if (blocks[x][y][z] == 1
+	    || blocks[x][y][z] == 2
+	    || (x >= 7 && x <= 13)
+	    && (z >= 7 && z <= 13)) {
+      return setSpheres(i);
+    } else {
+      blocks[x][y][z] = 2;
+      return setSpheres(i - 1);
+    }
+  }
+
+  private void initBlocksArray() {
+    // start zone blocks
+    for (int x = 9; x <= 11; x++) {
+      for (int z = 9; z <= 11; z++) {
+	blocks[x][0][z] = 1;
+      }
+    }
+    // set random blocks
+    setBlocks(blocksAmount);
+    // set random spheres
+    setSpheres(level);
+  }
+
+  private void createBlocks() {
+    shootables = new Node("Shootables");
+    smashed = new Node("Smashed");
+    int size = blocks.length;
+    for (int x = 0; x < size; x++) {
+      for (int y = 0; y < height; y++) {
+	for (int z = 0; z < size; z++) {
+	  if (blocks[x][y][z] == 1) {
+	    makeBlock(2 * x, 2 * y, 2 * z);
+	  } else if (blocks[x][y][z] == 2) {
+	    makeBall(2 * x, 2 * y, 2 * z);
+	  }
+	}
+      }
+    }
+  }
+
+  private void makeBall(float a, float b, float c) {
+    shootables.attachChild(makeSphere("ball" + blockName++, a, b, c));
+  }
+
+  private void makeBlock(float a, float b, float c) {
+    shootables.attachChild(makeCube("block" + blockName++, a, b, c));
+  }
+
+  private void initKeys() {
+    // delete some bindings
+    String[] bindings = {"SIMPLEAPP_Exit",
+      "SIMPLEAPP_CameraPos",
+      "SIMPLEAPP_Memory"};
+    for (String s : bindings) {
+      inputManager.deleteMapping(s);
+    }
+    // mouse
+    inputManager.addMapping("Shoot", new MouseButtonTrigger(0));
+    inputManager.addMapping("Smash", new MouseButtonTrigger(1));
+    // keyboard
+    inputManager.addMapping("Menu", new KeyTrigger(KeyInput.KEY_ESCAPE));
+    inputManager.addMapping("Lefts", new KeyTrigger(KeyInput.KEY_A));
+    inputManager.addMapping("Rights", new KeyTrigger(KeyInput.KEY_D));
+    inputManager.addMapping("Ups", new KeyTrigger(KeyInput.KEY_W));
+    inputManager.addMapping("Downs", new KeyTrigger(KeyInput.KEY_S));
+    inputManager.addMapping("Jumps", new KeyTrigger(KeyInput.KEY_SPACE));
+    // add mappings to listener
+    inputManager.addListener(actionListener, "Smash",
+	    "Shoot",
+	    "Menu",
+	    "Lefts",
+	    "Rights",
+	    "Ups",
+	    "Downs",
+	    "Jumps");
+  }
+  private ActionListener actionListener = new ActionListener() {
+
+    @Override
+    public void onAction(String name, boolean keyPressed, float tpf) {
+      if (name.equals("Lefts")) {
+	left = keyPressed;
+      } else if (name.equals("Rights")) {
+	right = keyPressed;
+      } else if (name.equals("Ups")) {
+	up = keyPressed;
+      } else if (name.equals("Downs")) {
+	down = keyPressed;
+      } else if (name.equals("Jumps")) {
+	player.jump();
+      } else if (name.equals("Menu") && !keyPressed) {
+	if (inMenu) {
+	  backFromMenu();
+	} else {
+	  setupMenu();
+	}
+      }
+
+      // SHOOT - or - SMASH
+      if ((name.equals("Shoot") || name.equals("Smash")) && !keyPressed) {
+	// 1. Reset results list.
+	CollisionResults results = new CollisionResults();
+	// 2. Aim the ray from cam loc to cam direction.
+	Ray ray = new Ray(cam.getLocation(), cam.getDirection());
+	// 3. Collect intersections between Ray and Shootables in results list.
+	shootables.collideWith(ray, results);
+	// 4. Print the results.
+	//System.out.println("----- Collisions? " + results.size() + "-----");
+	for (int i = 0; i < results.size(); i++) {
+	  CollisionResult c = results.getCollision(i);
+	  if (c.getGeometry() == null) {
+	    //System.out.println("Picking failed...");
+	    return;
+	  }
+	  // For each hit, we know distance, impact point, name of geometry.
+	  //float dist = c.getDistance();
+	  //Vector3f pt = c.getContactPoint();
+	  //String hit = c.getGeometry().getName();
+	  //System.out.println("* Collision #" + i);
+	  //System.out.println("  You shot " + hit + " at " + pt + ", " + dist + " wu away.");
+	}
+	// 5. Use the results (we mark the hit object)
+	if (results.size() > 0) {
+	  // The closest collision point is what was truly hit:
+	  CollisionResult closest = results.getClosestCollision();
+	  colorBox(name, closest);
+	  // Let's interact - we mark the hit with a red dot.
+	  mark.setLocalTranslation(closest.getContactPoint());
+	  if (placeHitSphere) {
+	    rootNode.attachChild(mark);
+	  }
+	} else {
+	  // No hits? Then remove the red mark.
+	  rootNode.detachChild(mark);
+	}
+      }
+    }
+
+    private void colorBox(String name, CollisionResult closest) {
+      Geometry g = closest.getGeometry();
+      //System.out.println("color this: " + g.getName().substring(0, 4));
+      // do not color floor
+      if (g.getName().substring(0, 5).equals("floor")) {
+	return;
+      }
+      // set color
+      Material mat1 = new Material(
+	  assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
+      mat1.setColor("m_Color", ColorRGBA.randomColor());
+      // color the ball and decrement orbsLeft
+      if (g.getName().substring(0, 4).equals("ball")) {
+	// new unique name that starts with hit
+	g.setName("hit"+g.getName());
+	// set mat and update orbsLeft
+	g.setMaterial(mat1);
+	orbsLeftTxt.setText("ORBS LEFT: " + --orbsLeft);
+      }
+      if(orbsLeft == 0){
+	youWin();
+      }
+      if (name.equals("Shoot") &&
+	  !g.getName().substring(0, 3).equals("hit")) {
+	//audioRenderer.playSource(audioPaint);
+	// new unique name that starts with hit
+	g.setName("hit"+g.getName());
+	// set mat and update blocksPainted
+	g.setMaterial(mat1);
+	paintedTxt.setText("BLOCKS PAINTED: " + ++blocksPainted);
+	// smash
+      } else if (name.equals("Smash") && smashesLeft > 0) {
+	landscape.detachChild(g);
+	smashed.attachChild(g);
+	smashedTxt.setText("SMASHES LEFT: " + --smashesLeft);
+	makeRespawnThread(g);
+      }
+      //System.out.println(g.getName());
+    }
+  };
+
+  private void makeRespawnThread(Geometry geom) {
+    final Geometry g = geom;
+    new Thread(new Runnable() {
+
+      public void run() {
+	try {
+	  Thread.currentThread().sleep(blockRespawnTime);
+	} catch (Exception e) {
+	  System.out.println("Could not spawn block!");
+	}
+	//bulletAppState.getPhysicsSpace()
+	//landscape.attachChild(g);
+	shootables.attachChild(g);
+	smashed.detachChild(g);
+	smashedTxt.setText("SMASHES LEFT: " + ++smashesLeft);
+      }
+    }).start();
+  }
+
+  private Geometry makeSphere(String name, float x, float y, float z) {
+    Sphere sphere = new Sphere(10, 10, 1f);
+    Geometry ball = new Geometry(name, sphere);
+    ball.setLocalTranslation(x, y, z);
+    Material mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
+    mat.setColor("m_Color", ColorRGBA.White);
+    //mat.setColor("m_Color", ColorRGBA.randomColor());
+    ball.setMaterial(mat);
+    return ball;
+  }
+
+  private Geometry makeCube(String name, float x, float y, float z) {
+    Box box = new Box(new Vector3f(x, y, z), 1, 1, 1);
+    Geometry cube = new Geometry(name, box);
+    //cube.setQueueBucket(Bucket.Transparent); // no clip
+    Material mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
+    //mat1.getAdditionalRenderState().setDepthTest(false); // no clip
+    mat.setColor("m_Color", ColorRGBA.White);
+    //mat1.setColor("m_Color", ColorRGBA.randomColor());
+    cube.setMaterial(mat);
+    return cube;
+  }
+
+  private void initBorders() {
+    Material mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
+    mat.setColor("m_Color", ColorRGBA.Black);
+
+    // under the blocks
+    Box box = new Box(new Vector3f(19, -1, 19), 20.2f, .1f, 20.2f);
+    Geometry floor = new Geometry("floor1", box);
+    floor.setMaterial(mat);
+    shootables.attachChild(floor);
+
+    // over the blocks
+    Box box3 = new Box(new Vector3f(19, 9, 19), 20.2f, .1f, 20.2f);
+    Geometry floor3 = new Geometry("floor3", box3);
+    floor3.setMaterial(mat);
+    shootables.attachChild(floor3);
+  }
+
+  private void initMark() {
+    Sphere sphere = new Sphere(30, 30, 0.2f);
+    mark = new Geometry("BOOM!", sphere);
+    Material mark_mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
+    mark_mat.setColor("m_Color", ColorRGBA.Red);
+    mark.setMaterial(mark_mat);
+  }
+
+  private void initCrossHairs() {
+    guiNode.detachAllChildren();
+    guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+    ch = new BitmapText(guiFont, false);
+    ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+    ch.setText("+"); // crosshairs
+    ch.setLocalTranslation( // center
+	    settings.getWidth() / 2 - guiFont.getCharSet().getRenderedSize() / 3 * 2,
+	    settings.getHeight() / 2 + ch.getLineHeight() / 2, 0);
+    guiNode.attachChild(ch);
+  }
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nifty>
+  <screen id="start" controller="mygame.Menu">
+    <layer id="mainLayer" childLayout="right">
+
+
+    </layer>
+  </screen>
+</nifty>
