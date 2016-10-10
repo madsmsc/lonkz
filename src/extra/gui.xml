@@ -12,55 +12,55 @@
 
                 <panel id="level" height="60%" width="12.1%"
                 backgroundColor="#66666690" childLayout="center" visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
-                <panel id="SPACER" height="1%" width="10%"
+                <panel id="SPACER" height="1%" width="10%" childLayout="center"
                 backgroundColor="#0000"  visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
                 <panel id="paints" height="60%" width="12.1%"
                 backgroundColor="#66666690" childLayout="center" visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
-                <panel id="SPACER" height="1%" width="10%"
+                <panel id="SPACER" height="1%" width="10%" childLayout="center"
                 backgroundColor="#0000"  visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
-                <panel id="smash" height="60%" width="12.1%"
+                <panel id="smash" height="60%" width="12.1%" 
                 backgroundColor="#66666690" childLayout="center" visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
-                <panel id="SPACER" height="1%" width="10%"
+                <panel id="SPACER" height="1%" width="10%" childLayout="center"
                 backgroundColor="#0000"  visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
                 <panel id="orbs" height="60%" width="12.1%"
                 backgroundColor="#66666690" childLayout="center" visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
-                <panel id="SPACER" height="1%" width="10%"
+                <panel id="SPACER" height="1%" width="10%" childLayout="center"
                 backgroundColor="#0000"  visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
 
                 <panel id="fps" height="60%" width="12.1%"
                 backgroundColor="#66666690" childLayout="center" visibleToMouse="false">
-                    <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                    <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
                     text=" " align="center" valign="center" />
                 </panel>
             </panel>

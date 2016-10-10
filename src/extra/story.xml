@@ -10,7 +10,7 @@
 
             <panel id="story" height="50%" width="60%" align="center"
              backgroundColor="#666" childLayout="center" visibleToMouse="true">
-                <label id="txtCurrentDescription" height="100%" width="100%" font="aurulent-sans-17.fnt"
+                <label id="txtCurrentDescription" height="100%" width="100%" font="Interface/Fonts/CourierNew.fnt"
                        align="left" valign="center" wrap="true"
 text="                           There's trouble in cube world!                               
 Wicked spheres have invaded the otherwise peaceful world of the cubes.
@@ -37,7 +37,7 @@ Good luck. CUBE!" />
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Play" align="center" valign="center" />
             </panel>
 
@@ -53,7 +53,7 @@ Good luck. CUBE!" />
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Back" align="center" valign="center" />
             </panel>
 

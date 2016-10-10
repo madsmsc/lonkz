@@ -4,9 +4,7 @@ import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.collision.shapes.CompoundCollisionShape;
-import com.jme3.bullet.nodes.PhysicsCharacterNode;
-import com.jme3.bullet.nodes.PhysicsNode;
-import com.jme3.bullet.util.CollisionShapeFactory;
+import com.jme3.bullet.objects.PhysicsCharacter;
 import com.jme3.collision.CollisionResult;
 import com.jme3.collision.CollisionResults;
 import com.jme3.effect.ParticleEmitter;
@@ -46,8 +44,7 @@ public class Engine extends SimpleApplication {
   private CompoundCollisionShape sceneShape;
   private NiftyJmeDisplay niftyDisplay;
   private BulletAppState bulletAppState;
-  private PhysicsNode landscape;
-  private PhysicsCharacterNode player;
+  private PhysicsCharacter player;
   private Vector3f walkDirection;
   private Node shootables, smashed;
   private Geometry mark;
@@ -87,19 +84,18 @@ public class Engine extends SimpleApplication {
 
   public void simpleInitApp() {
     initFields();
-    showGui("splashScreen.xml");
-    //initEngine();
+//    showGui("splashScreen.xml");
+    initEngine();
   }
 
   public void initEngine() {
-    initFields();
+    initCollision();
     initSteering();
     initMark();
     //initAudio();
     initBlocksArray();
     createBlocks();
     initBorders();
-    initCollision();
     backFromMenu();
     initSky();
     initCam();
@@ -107,57 +103,15 @@ public class Engine extends SimpleApplication {
   }
   
   private void initCam() {
-    // top/bottom and right/left shuuld be each others negation
-    // Higher values makes the world appear further away
+    // top/bottom and right/left shuuld be each other's negation
+    // higher values makes the world appear further away
     cam.setFrustumNear(0.6f);
     cam.setFrustumTop(0.4f);
     cam.setFrustumBottom(-0.4f);
     cam.setFrustumLeft(-0.5f);
     cam.setFrustumRight(0.5f);
   }
-
-  private void updateRoot() {
-    rootNode.updateGeometricState();
-  }
-
-  private void destroySphere(Vector3f loc) {
-    ParticleEmitter fire;
-    ParticleEmitter debris;
-    fire = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 30);
-    Material mat_red = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
-    mat_red.setTexture("m_Texture", assetManager.loadTexture("Textures/flame.png"));
-    fire.setMaterial(mat_red);
-    fire.setImagesX(2);
-    fire.setImagesY(2); // 2x2 texture animation
-    fire.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));   // red
-    fire.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f)); // yellow
-    fire.setStartVel(new Vector3f(0, 2, 0));
-    fire.setStartSize(0.5f);
-    fire.setEndSize(1f);
-    fire.setGravity(1);
-    fire.setLowLife(0.5f);
-    fire.setHighLife(5f);
-    //fire.setVariation(0.3f);
-    fire.setLocalTranslation(loc);
-    rootNode.attachChild(fire);
-
-    debris = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 10);
-    Material debris_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
-    debris_mat.setTexture("m_Texture", assetManager.loadTexture("Textures/debris.png"));
-    debris.setMaterial(debris_mat);
-    debris.setImagesX(3);
-    debris.setImagesY(3); // 3x3 texture animation
-    debris.setRotateSpeed(4);
-    debris.setSelectRandomImage(true);
-    debris.setStartVel(new Vector3f(0, 4, 0));
-    debris.setStartColor(new ColorRGBA(1f, 1f, 1f, 1f));
-    debris.setGravity(6f);
-    //debris.setVariation(.60f);
-    rootNode.attachChild(debris);
-    debris.setLocalTranslation(loc);
-    debris.emitAllParticles();
-  }
-
+  
   private void initFields() {
     inMenu = false;
     deathPlayed = false;
@@ -177,14 +131,61 @@ public class Engine extends SimpleApplication {
     blocksAmount = 50 + level * 50;
 
     fnt = assetManager.loadFont("Interface/Fonts/Default.fnt");
-    player = new PhysicsCharacterNode(new CapsuleCollisionShape(0.8f, 2f, 1), .1f);
-
-    whiteMat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
-    whiteMat.setColor("m_Color", ColorRGBA.White);
+    player = new PhysicsCharacter(new CapsuleCollisionShape(0.8f, 2f, 1), .1f);
+    
+    whiteMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    whiteMat.setColor("Color", ColorRGBA.White);
 
     shootables = new Node("Shootables");
     smashed = new Node("Smashed");
     rootNode.detachAllChildren();
+  }
+
+  private void updateRoot() {
+    rootNode.updateGeometricState();
+  }
+
+  private void destroySphere(Vector3f loc) {
+    destroySphereFire(loc);
+    destroySphereDebris(loc);
+  }
+  
+  private void destroySphereFire(Vector3f loc){
+    ParticleEmitter  fire = new ParticleEmitter("Emitter", ParticleMesh.Type.Triangle, 30);
+    Material mat_red = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+    mat_red.setTexture("m_Texture", assetManager.loadTexture("Textures/flame.png"));
+    fire.setMaterial(mat_red);
+    fire.setImagesX(2);
+    fire.setImagesY(2); // 2x2 texture animation
+    fire.setEndColor(new ColorRGBA(1f, 0f, 0f, 1f));   // red
+    fire.setStartColor(new ColorRGBA(1f, 1f, 0f, 0.5f)); // yellow
+    //    fire.setStartVel(new Vector3f(0, 2, 0));
+    fire.setStartSize(0.5f);
+    fire.setEndSize(1f);
+    //    fire.setGravity(1);
+    fire.setLowLife(0.5f);
+    fire.setHighLife(5f);
+    //fire.setVariation(0.3f);
+    fire.setLocalTranslation(loc);
+    rootNode.attachChild(fire);
+  }
+  
+  private void destroySphereDebris(Vector3f loc){
+    ParticleEmitter debris = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 10);
+    Material debris_mat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+    debris_mat.setTexture("m_Texture", assetManager.loadTexture("Textures/debris.png"));
+    debris.setMaterial(debris_mat);
+    debris.setImagesX(3);
+    debris.setImagesY(3); // 3x3 texture animation
+    debris.setRotateSpeed(4);
+    debris.setSelectRandomImage(true);
+    //    debris.setStartVel(new Vector3f(0, 4, 0));
+    debris.setStartColor(new ColorRGBA(1f, 1f, 1f, 1f));
+    //    debris.setGravity(6f);
+    //debris.setVariation(.60f);
+    rootNode.attachChild(debris);
+    debris.setLocalTranslation(loc);
+    debris.emitAllParticles();
   }
 
   public void load() {
@@ -261,22 +262,27 @@ public class Engine extends SimpleApplication {
   }
 
   private void initSky() {
-    // sky blue
     viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
   }
 
   private void youWin() {
-    try {  // the mapping may or may not exist
+    try {  
+      // the mapping may or may not exist
+      // find a nicer way to handle this
       inputManager.deleteMapping("Menu");
     } catch (Exception e) {
+        
     }
     showGui("next.xml");
   }
 
   private void youLose() {
-    try {  // the mapping may or may not exist
+    try {  
+      // the mapping may or may not exist
+      // find a nicer way to handle this
       inputManager.deleteMapping("Menu");
     } catch (Exception e) {
+        
     }
     showGui("retry.xml");
   }
@@ -311,10 +317,19 @@ public class Engine extends SimpleApplication {
   public void simpleUpdate(float tpf) {
     Vector3f camDir = cam.getDirection().clone().multLocal(0.15f);
     Vector3f camLeft = cam.getLeft().clone().multLocal(0.1f);
+    
     // do not move vertically
     camDir.y = 0;
     camLeft.y = 0;
+    updateWalkDirection(camLeft, camDir);
+    updateFalling();
 
+    // make audio follow cam
+    listener.setLocation(cam.getLocation());
+    listener.setRotation(cam.getRotation());
+  }
+  
+  private void updateWalkDirection(Vector3f camLeft, Vector3f camDir) {
     walkDirection.set(0, 0, 0);
     if (left) {
       walkDirection.addLocal(camLeft);
@@ -329,24 +344,22 @@ public class Engine extends SimpleApplication {
       walkDirection.addLocal(camDir.negate());
     }
     player.setWalkDirection(walkDirection);
-    cam.setLocation(player.getLocalTranslation());
-
+    cam.setLocation(player.getPhysicsLocation());
+  }
+  
+  private void updateFalling(){
     // play falling sound
-    if (cam.getLocation().y < -2 && !deathPlayed) {
+    float fallSoundDist = -2;
+    if (cam.getLocation().y < fallSoundDist && !deathPlayed) {
       deathPlayed = true;
       //audioRenderer.playSource(audioDeath);
     }
 
     // lose if you fall too far.
-    if (cam.getLocation().y < deathFallDist
-            && !diedAlready) {
+    if (cam.getLocation().y < deathFallDist && !diedAlready) {
       diedAlready = true;
       youLose();
     }
-
-    // make audio follow cam
-    listener.setLocation(cam.getLocation());
-    listener.setRotation(cam.getRotation());
   }
 
   private void initCollision() {
@@ -358,24 +371,26 @@ public class Engine extends SimpleApplication {
     bulletAppState.setThreadingType(BulletAppState.ThreadingType.PARALLEL);
     stateManager.attach(bulletAppState);
 
-    sceneShape = (CompoundCollisionShape) CollisionShapeFactory.createMeshShape(shootables);
-    landscape = new PhysicsNode(shootables, sceneShape, 0);
-
-    //player = new PhysicsCharacterNode(new CapsuleCollisionShape(0.8f, 2f, 1), .1f);
     player.setJumpSpeed(15);
     player.setFallSpeed(30);
     player.setGravity(30);
-    player.setLocalTranslation(startLoc);
+    player.setPhysicsLocation(startLoc);
 
-    // attach to root node
-    rootNode.attachChild(landscape);
-    rootNode.attachChild(player);
-    bulletAppState.getPhysicsSpace().add(landscape);
+    rootNode.attachChild(shootables);
     bulletAppState.getPhysicsSpace().add(player);
+    // throws NPE, but without it you fall through the floor
+    //bulletAppState.getPhysicsSpace().add(shootables);
   }
 
   private void initGui() {
-    // painted
+    guiPainted();
+    guiSmashed();
+    guiOrbsLeft();
+    guiLevel();
+    guiFps();
+  }
+  
+  private void guiPainted() {
     paintedTxt = new BitmapText(fnt, false);
     paintedTxt.setBox(new Rectangle(2, -533,
             settings.getWidth(), settings.getHeight()));
@@ -384,8 +399,9 @@ public class Engine extends SimpleApplication {
     paintedTxt.setText("PAINTS \nLEFT: \n" + paintsLeft);
     paintedTxt.setLocalTranslation(0, settings.getHeight(), 0);
     guiNode.attachChild(paintedTxt);
+  }
 
-    // smashed
+  private void guiSmashed() {
     smashedTxt = new BitmapText(fnt, false);
     smashedTxt.setBox(new Rectangle(180, -533,
             settings.getWidth(), settings.getHeight()));
@@ -394,8 +410,9 @@ public class Engine extends SimpleApplication {
     smashedTxt.setText("SMASHES \nLEFT: \n" + smashesLeft);
     smashedTxt.setLocalTranslation(0, settings.getHeight(), 0);
     guiNode.attachChild(smashedTxt);
+  }
 
-    // orbs left
+  private void guiOrbsLeft() {
     orbsLeftTxt = new BitmapText(fnt, false);
     orbsLeftTxt.setBox(new Rectangle(360, -533,
             settings.getWidth(), settings.getHeight()));
@@ -404,8 +421,9 @@ public class Engine extends SimpleApplication {
     orbsLeftTxt.setText("ORBS \nLEFT: \n" + orbsLeft);
     orbsLeftTxt.setLocalTranslation(0, settings.getHeight(), 0);
     guiNode.attachChild(orbsLeftTxt);
+  }
 
-    // level
+  private void guiLevel() {
     levelTxt = new BitmapText(fnt, false);
     levelTxt.setBox(new Rectangle(540, -533,
             settings.getWidth(), settings.getHeight()));
@@ -414,8 +432,9 @@ public class Engine extends SimpleApplication {
     levelTxt.setText("\nLEVEL: \n" + level);
     levelTxt.setLocalTranslation(0, settings.getHeight(), 0);
     guiNode.attachChild(levelTxt);
+  }
 
-    // set fps text
+  private void guiFps() {
     fpsText.setBox(new Rectangle(720, -533,
             settings.getWidth(), settings.getHeight()));
     fpsText.setSize(fnt.getPreferredSize() * 1f);
@@ -480,21 +499,16 @@ public class Engine extends SimpleApplication {
   }
   
   private void initBlocksArray() {
-    // zero out the array
     zeroBlocksArray();
-    // start zone blocks
     makeStartZone();
-    // set random blocks
     setBlocks(blocksAmount);
-    // set random spheres
     setSpheres(orbsLeft);
   }
 
   private void createBlocks() {
-    int size = blocks.length;
-    for (int x = 0; x < size; x++) {
+    for (int x = 0; x < blocks.length; x++) {
       for (int y = 0; y < height; y++) {
-        for (int z = 0; z < size; z++) {
+        for (int z = 0; z < blocks.length; z++) {
           if (blocks[x][y][z] == 1) {
             makeBlock(2 * x, 2 * y, 2 * z);
           } else if (blocks[x][y][z] == 2) {
@@ -514,7 +528,7 @@ public class Engine extends SimpleApplication {
   }
 
   private void initSteering() {
-    // delete some bindings
+    // delete bindings
     if (!mappingsDeleted) {
       String[] bindings = {"SIMPLEAPP_Exit",
         "SIMPLEAPP_CameraPos",
@@ -535,17 +549,153 @@ public class Engine extends SimpleApplication {
     inputManager.addMapping("Downs", new KeyTrigger(KeyInput.KEY_S));
     inputManager.addMapping("Jumps", new KeyTrigger(KeyInput.KEY_SPACE));
     // add mappings to listener
-    inputManager.addListener(actionListener, "Smash",
-            "Shoot",
-            "Menu",
-            "Lefts",
-            "Rights",
-            "Ups",
-            "Downs",
-            "Jumps");
+    inputManager.addListener(actionListener, 
+      "Smash", "Shoot", "Menu", "Lefts",
+      "Rights", "Ups", "Downs", "Jumps");
   }
-  private ActionListener actionListener = new ActionListener() {
 
+  private void shootablesAttach(Geometry g) {
+    shootables.attachChild(g);
+  }
+
+  private void shootablesDetach(Geometry g) {
+    shootables.detachChild(g);
+  }
+
+  private void makePaintThread(Geometry geom) {
+      final Geometry g = geom;
+      new Thread(new Runnable() {
+
+        public void run() {
+            // PLAY
+            String name = g.getName();
+            g.setName("hit" + g.getName());
+            Material randomMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            randomMat.setColor("Color", ColorRGBA.randomColor());
+            g.setMaterial(randomMat);
+            paintedTxt.setText("PAINTS \nLEFT: \n" + --paintsLeft);
+
+          try {
+            Thread.currentThread().sleep(blockPaintTime);
+          } catch (Exception e) {
+            System.out.println("Sleeping failed!");
+          }
+            g.setName(name);
+            g.setMaterial(whiteMat);
+            paintedTxt.setText("PAINTS \nLEFT: \n" + ++paintsLeft);
+        }
+      }).start();
+  }
+
+  private void makeRespawnThread(Geometry geom, CollisionResult result) {
+    final Geometry g = geom;
+    final CollisionResult cr = result;
+    // You have to call bulletAppState.getPhysicsSpace().remove(box);
+    // somewhere to remove the physics control from the physics space.
+    // the appstate is already updated automatically,
+    // so doing the update thing is not good.
+    new Thread(new Runnable() {  
+        public void run() {
+          try {
+            //bulletAppState.getPhysicsSpace().remove(landscape);
+            //shootablesDetach(g);
+            //smashed.attachChild(g);
+            //landscape = new PhysicsNode(shootables, sceneShape, 0);
+            //bulletAppState.getPhysicsSpace().add(landscape);
+            bulletAppState.getPhysicsSpace().remove(cr);
+            smashedTxt.setText("SMASHES \nLEFT: \n" + --smashesLeft);
+          } catch (Exception e) {
+            System.out.println("disappear");
+            e.printStackTrace();
+          }
+
+          try {
+            Thread.currentThread().sleep(blockRespawnTime);
+          } catch (Exception e) {
+            System.out.println("Sleeping failed!");
+          }
+
+          try {
+            shootablesAttach(g);
+            smashed.detachChild(g); // perhaps not necessary?
+            bulletAppState.getPhysicsSpace().add(cr);
+            smashedTxt.setText("SMASHES \nLEFT: \n" + ++smashesLeft);
+          } catch (Exception e) {
+            System.out.println("appear");
+          }
+          }
+      }).start();
+  }
+
+  private Geometry makeSphere(String name, float x, float y, float z) {
+    Sphere sphere = new Sphere(10, 10, 1f);
+    Geometry ball = new Geometry(name, sphere);
+    ball.setLocalTranslation(x, y, z);
+    Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    mat.setColor("Color", ColorRGBA.White);
+    //mat.setColor("Color", ColorRGBA.randomColor());
+    ball.setMaterial(mat);
+    ball.setCullHint(CullHint.Never);
+    return ball;
+  }
+
+  private Geometry makeCube(String name, float x, float y, float z) {
+    Vector3f center = new Vector3f(x, y, z);
+    Box box = new Box(center, 1, 1, 1);
+    Geometry cube = new Geometry(name, box);
+    //cube.setQueueBucket(Bucket.Transparent); // no clip
+    Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    //mat1.getAdditionalRenderState().setDepthTest(false); // no clip
+    mat.setColor("Color", ColorRGBA.White);
+    //mat.setColor("Color", ColorRGBA.randomColor());
+    cube.setMaterial(mat);
+    cube.setCullHint(CullHint.Never);
+    return cube;
+  }
+
+  private void initBorders() {
+    Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    mat.setColor("Color", ColorRGBA.Black);
+    // under the blocks
+    // place in level 1 and 2 -- doesn't scale with world size
+    if (level == 1 || level == 2) {
+      Box box = new Box(new Vector3f(19, -1, 19), 20.2f, .1f, 20.2f);
+      Geometry floor = new Geometry("floor1", box);
+      floor.setMaterial(mat);
+      shootables.attachChild(floor);
+    }
+
+    // over the blocks -- not fun... might be implemented later
+    //if (level == 2 || level == 3) {
+    //Box box3 = new Box(new Vector3f(19, 9, 19), 20.2f, .1f, 20.2f);
+    //Geometry floor3 = new Geometry("floor3", box3);
+    //floor3.setMaterial(mat);
+    //shootables.attachChild(floor3);
+    //}
+  }
+
+  private void initMark() {
+    Sphere sphere = new Sphere(30, 30, 0.2f);
+    mark = new Geometry("BOOM!", sphere);
+    Material mark_mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+    mark_mat.setColor("Color", ColorRGBA.Red);
+    mark.setMaterial(mark_mat);
+  }
+
+  private void initCrossHairs() {
+    //guiNode.detachAllChildren();
+    guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+    ch = new BitmapText(guiFont, false);
+    ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+    ch.setText("+"); // crosshairs
+    ch.setLocalTranslation( // center
+            settings.getWidth() / 2 - guiFont.getCharSet().getRenderedSize() / 3 * 2,
+            settings.getHeight() / 2 + ch.getLineHeight() / 2, 0);
+    guiNode.attachChild(ch);
+  }
+  
+  // the action listener needs refactoring
+  private ActionListener actionListener = new ActionListener() {
     @Override
     public void onAction(String name, boolean keyPressed, float tpf) {
       if (name.equals("Lefts")) {
@@ -631,148 +781,4 @@ public class Engine extends SimpleApplication {
       }
     }
   };
-
-  private void shootablesAttach(Geometry g) {
-    shootables.attachChild(g);
-  }
-
-  private void shootablesDetach(Geometry g) {
-    shootables.detachChild(g);
-  }
-
-  private void makePaintThread(Geometry geom) {
-      final Geometry g = geom;
-      new Thread(new Runnable() {
-
-        public void run() {
-            // PLAY
-            String name = g.getName();
-            g.setName("hit" + g.getName());
-            Material randomMat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
-            randomMat.setColor("m_Color", ColorRGBA.randomColor());
-            g.setMaterial(randomMat);
-            paintedTxt.setText("PAINTS \nLEFT: \n" + --paintsLeft);
-
-          try { // sleep
-            Thread.currentThread().sleep(blockPaintTime);
-          } catch (Exception e) {
-            System.out.println("Sleeping failed!");
-          }
-            g.setName(name);
-            g.setMaterial(whiteMat);
-            paintedTxt.setText("PAINTS \nLEFT: \n" + ++paintsLeft);
-        }
-      }).start();
-  }
-
-  private void makeRespawnThread(Geometry geom, CollisionResult result) {
-      final Geometry g = geom;
-      final CollisionResult cr = result;
-      new Thread(new Runnable() {
-
-/* You have to call bulletAppState.getPhysicsSpace().remove(box);
- somewhere to remove the physics control from the physics space.
- the appstate is already updated automatically,
- so doing the update thing is not good.
- */
-        
-        public void run() {
-          try {
-//            bulletAppState.getPhysicsSpace().remove(landscape);
-//            shootablesDetach(g);
-//            smashed.attachChild(g);
-//            landscape = new PhysicsNode(shootables, sceneShape, 0);
-//            bulletAppState.getPhysicsSpace().add(landscape);
-            bulletAppState.getPhysicsSpace().remove(cr);
-            smashedTxt.setText("SMASHES \nLEFT: \n" + --smashesLeft);
-          } catch (Exception e) {
-            System.out.println("disappear");
-            e.printStackTrace();
-          }
-
-          try { // sleep
-            Thread.currentThread().sleep(blockRespawnTime);
-          } catch (Exception e) {
-            System.out.println("Sleeping failed!");
-          }
-
-          try {
-            shootablesAttach(g);
-            smashed.detachChild(g); // perhaps not necessary?
-            bulletAppState.getPhysicsSpace().add(cr);
-            smashedTxt.setText("SMASHES \nLEFT: \n" + ++smashesLeft);
-          } catch (Exception e) {
-            System.out.println("appear");
-          }
-        }
-      }).start();
-  }
-
-  private Geometry makeSphere(String name, float x, float y, float z) {
-    Sphere sphere = new Sphere(10, 10, 1f);
-    Geometry ball = new Geometry(name, sphere);
-    ball.setLocalTranslation(x, y, z);
-    Material mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
-    mat.setColor("m_Color", ColorRGBA.White);
-    //mat.setColor("m_Color", ColorRGBA.randomColor());
-    ball.setMaterial(mat);
-    ball.setCullHint(CullHint.Never);
-    return ball;
-  }
-
-  private Geometry makeCube(String name, float x, float y, float z) {
-    Vector3f center = new Vector3f(x, y, z);
-    Box box = new Box(center, 1, 1, 1);
-    Geometry cube = new Geometry(name, box);
-    //cube.setQueueBucket(Bucket.Transparent); // no clip
-    Material mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
-    //mat1.getAdditionalRenderState().setDepthTest(false); // no clip
-    mat.setColor("m_Color", ColorRGBA.White);
-    //mat.setColor("m_Color", ColorRGBA.randomColor());
-    cube.setMaterial(mat);
-    cube.setCullHint(CullHint.Never);
-    return cube;
-  }
-
-  private void initBorders() {
-    Material mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
-    mat.setColor("m_Color", ColorRGBA.Black);
-    // under the blocks
-    // place in level 1 and 2 -- doesn't scale with world size
-    if (level == 1 || level == 2) {
-      Box box = new Box(new Vector3f(19, -1, 19), 20.2f, .1f, 20.2f);
-      Geometry floor = new Geometry("floor1", box);
-      floor.setMaterial(mat);
-      shootables.attachChild(floor);
-    }
-
-    /* over the blocks -- not fun... might be implemented later
-    if (level == 2 || level == 3) {
-    Box box3 = new Box(new Vector3f(19, 9, 19), 20.2f, .1f, 20.2f);
-    Geometry floor3 = new Geometry("floor3", box3);
-    floor3.setMaterial(mat);
-    shootables.attachChild(floor3);
-    }
-     */
-  }
-
-  private void initMark() {
-    Sphere sphere = new Sphere(30, 30, 0.2f);
-    mark = new Geometry("BOOM!", sphere);
-    Material mark_mat = new Material(assetManager, "Common/MatDefs/Misc/SolidColor.j3md");
-    mark_mat.setColor("m_Color", ColorRGBA.Red);
-    mark.setMaterial(mark_mat);
-  }
-
-  private void initCrossHairs() {
-    //guiNode.detachAllChildren();
-    guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-    ch = new BitmapText(guiFont, false);
-    ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-    ch.setText("+"); // crosshairs
-    ch.setLocalTranslation( // center
-            settings.getWidth() / 2 - guiFont.getCharSet().getRenderedSize() / 3 * 2,
-            settings.getHeight() / 2 + ch.getLineHeight() / 2, 0);
-    guiNode.attachChild(ch);
-  }
 }

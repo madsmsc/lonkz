@@ -10,7 +10,7 @@
 
             <panel id="load" height="30%" width="60%" align="center"
              backgroundColor="#666" childLayout="center" visibleToMouse="true">
-                <label id="txtCurrentDescription" height="10%" width="100%" font="aurulent-sans-17.fnt"
+                <label id="txtCurrentDescription" height="10%" width="100%" font="Interface/Fonts/CourierNew.fnt"
                 text="Not implemented yet..."
                 align="center" valign="center" wrap="true" />
             </panel>
@@ -28,7 +28,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Back" align="center" valign="center" />
             </panel>
 

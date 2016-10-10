@@ -19,7 +19,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#EE7F"
 	           endColor="#EE7F" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="You died!" align="center" valign="center" />
             </panel>
 
@@ -35,7 +35,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#EE7F"
 	           endColor="#EE7F" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Retry" align="center" valign="center" />
             </panel>
 
@@ -51,7 +51,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#EE7F"
 	           endColor="#EE7F" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Exit Game" align="center" valign="center" />
             </panel>
 

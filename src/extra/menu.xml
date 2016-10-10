@@ -16,7 +16,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Play" align="center" valign="center" />
             </panel>
 
@@ -32,7 +32,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Load" align="center" valign="center" />
             </panel>
 
@@ -48,7 +48,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Controls" align="center" valign="center" />
             </panel>
 
@@ -64,7 +64,7 @@
                     <onHover name="pulsate" scaleFactor="0.008" startColor="#sd02"
 	           endColor="#sd02" post="true"/>
                 </effect>
-                <text id="text" font="aurulent-sans-17.fnt" color="#000F"
+                <text id="text" font="Interface/Fonts/CourierNew.fnt" color="#000F"
 	      text="Exit" align="center" valign="center" />
             </panel>
 
